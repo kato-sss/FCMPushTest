@@ -44,7 +44,7 @@
       </div>
   </div>
     <div class="form-group row mt-2">
-      <label for="" class="control-label col-md-3 col-form-label-sm" id="status_token"></label>
+      <label for="" class="control-label col-md-3 col-form-label-sm" id="status_token">トークン</label>
       <div class="col-md-6">
         <label for="" class="control-label col-md-3 col-form-label-sm" id="output_token"></label>
       </div>
@@ -89,8 +89,7 @@
                     .then((token) => {
                         if (token) {
                             // tokenを出力
-                            console.log("新規トークン", token);
-                            document.getElementById('status_token').textContent = "新規トークン";
+                            console.log("トークン", token);
                             outputElement.textContent = token;
                         } else {
                             console.log('登録トークンがありません。生成する許可をリクエストします。');
@@ -111,8 +110,7 @@
                 .then((token) => {
                     if (token) {
                         // tokenを出力
-                        console.log("登録済みトークン：", token);
-                        document.getElementById('status_token').textContent = "既存トークン";
+                        console.log("トークン", token);
                         outputElement.textContent = token;
                     } else {
                         console.log('登録トークンがありません。生成する許可をリクエストします。');
