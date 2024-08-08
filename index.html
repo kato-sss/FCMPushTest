@@ -32,36 +32,52 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
 
-        // 通知を許可するボタンが押された時のアクション
-        const btn = document.getElementById('allow_push_notification');
-        btn.addEventListener("click", function () {
-            //let promise = Notification.requestPermission();
-            //console.log("promise: ",promise);
-            if (!("Notification" in window)) {
-                // ブラウザーが通知に対応しているか調べる
-                alert("このブラウザーはデスクトップ通知には対応していません。");
-            } else if (Notification.permission !== "denied") {
-
-            //if(Notification.permission !== "denied") {
-                Notification.requestPermission().then((permission) => {
-                    const messaging = getMessaging();
-                    // Add the public key generated from the console here.
-                    getToken(messaging, {vapidKey: "BCeDzQJ4Su-ONDPklO-I8AzcyX38zZ9OJM5Q1eZsR8OMoOcGrgmR-aP5ZjVsi0UlC3yj110DG0_jJqd91-wBkRQ"})
-                        .then((token) => {
-                            if (token) {
-                                // tokenを出力
-                                //document.getElementById('output').textContent = `${token.Promise}`;
-                                console.log( "token", token);
-                                document.getElementById('output').textContent = token;
-                            }else{
-                                console.log('登録トークンがありません。生成する許可をリクエストします。');
-                            }
-                        })
-                        .catch((err) => {
-                            console.log('getToken Error',err);
-                        });
+		// ページの読み込み時に通知を許可し、トークンを取得します
+        window.addEventListener('load', function () {
+          if (!("Notification" in window)) {
+            // ブラウザーが通知に対応しているか調べる
+            alert("このブラウザーはデスクトップ通知には対応していません。");
+          } else if (Notification.permission === "default") {
+            // 通知の許可がまだされていない場合
+            Notification.requestPermission().then((permission) => {
+              if (permission === "granted") {
+                const messaging = getMessaging();
+                // Add the public key generated from the console here.
+                getToken(messaging, {vapidKey: "BCeDzQJ4Su-ONDPklO-I8AzcyX38zZ9OJM5Q1eZsR8OMoOcGrgmR-aP5ZjVsi0UlC3yj110DG0_jJqd91-wBkRQ"})
+                    .then((token) => {
+                        if (token) {
+                            // tokenを出力
+                            console.log("token", token);
+                            document.getElementById('output').textContent = token;
+                        } else {
+                            console.log('登録トークンがありません。生成する許可をリクエストします。');
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('getToken Error', err);
+                    });
+              } else {
+                console.log("通知の許可が得られませんでした。");
+              }
+            });
+          } else if (Notification.permission === "granted") {
+            // 通知が既に許可されている場合
+            const messaging = getMessaging();
+            // Add the public key generated from the console here.
+            getToken(messaging, {vapidKey: "BCeDzQJ4Su-ONDPklO-I8AzcyX38zZ9OJM5Q1eZsR8OMoOcGrgmR-aP5ZjVsi0UlC3yj110DG0_jJqd91-wBkRQ"})
+                .then((token) => {
+                    if (token) {
+                        // tokenを出力
+                        console.log("token", token);
+                        document.getElementById('output').textContent = token;
+                    } else {
+                        console.log('登録トークンがありません。生成する許可をリクエストします。');
+                    }
+                })
+                .catch((err) => {
+                    console.log('getToken Error', err);
                 });
-            }
+          }
         });
     </script>
 </body>
