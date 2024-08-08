@@ -2,17 +2,56 @@
 <html>
 <head>
   <meta charset='utf-8/'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <script>
     // service workerが有効なら、service-worker.js を登録します
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js');
    }
   </script>
+  <style>
+    /* スマホでのレイアウト調整 */
+    .container-fluid {
+      padding: 15px; /* パディングを追加して余白を調整 */
+    }
+
+    /* ボタンとトークン出力エリアの調整 */
+    #copy_token, #allow_push_notification {
+      display: block;
+      width: 100%;
+      margin-top: 10px; /* 上部マージンを追加 */
+    }
+
+    #status_token, #output_token {
+      word-break: break-word; /* 長いテキストがはみ出さないようにする */
+    }
+
+    /* テキストエリアのスタイル */
+    #output {
+      word-break: break-word; /* 長いテキストがはみ出さないようにする */
+    }
+  </style>
 </head>
 <body>
-	<h1>FCM プッシュテスト</h1>
-    <button id="allow_push_notification">トークン取得</button>
+  <div class="container-fluid">
+    <h1>FCM プッシュテスト</h1>
+    <div class="form-group row pb-2">
+      <div class="col-6">
+        <button id="copy_token" class="btn btn-success mt-2">トークンコピー</button>
+      </div>
+  </div>
+    <div class="form-group row mt-2">
+      <label for="" class="control-label col-md-3 col-form-label-sm" id="status_token"></label>
+      <div class="col-md-6">
+        <label for="" class="control-label col-md-3 col-form-label-sm" id="output_token"></label>
+      </div>
+    </div>
+  </div>
+
+    <button id="allow_push_notification" style="display:none">トークン取得</button>
     <p id="output"></p>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -32,8 +71,11 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
 
-		// ページの読み込み時に通知を許可し、トークンを取得します
+        const copyButton = document.getElementById('copy_token');
+        const outputElement = document.getElementById('output_token');
+		    // ページの読み込み時に通知を許可し、トークンを取得します
         window.addEventListener('load', function () {
+          
           if (!("Notification" in window)) {
             // ブラウザーが通知に対応しているか調べる
             alert("このブラウザーはデスクトップ通知には対応していません。");
@@ -47,8 +89,9 @@
                     .then((token) => {
                         if (token) {
                             // tokenを出力
-                            console.log("token", token);
-                            document.getElementById('output').textContent = token;
+                            console.log("新規トークン", token);
+                            document.getElementById('status_token').textContent = "新規トークン";
+                            outputElement.textContent = token;
                         } else {
                             console.log('登録トークンがありません。生成する許可をリクエストします。');
                         }
@@ -68,8 +111,9 @@
                 .then((token) => {
                     if (token) {
                         // tokenを出力
-                        console.log("token", token);
-                        document.getElementById('output').textContent = token;
+                        console.log("登録済みトークン：", token);
+                        document.getElementById('status_token').textContent = "既存トークン";
+                        outputElement.textContent = token;
                     } else {
                         console.log('登録トークンがありません。生成する許可をリクエストします。');
                     }
@@ -78,6 +122,18 @@
                     console.log('getToken Error', err);
                 });
           }
+        });
+
+        // ボタンがクリックされたときにトークンをコピー
+        copyButton.addEventListener('click', function () {
+          const tokenText = outputElement.textContent || outputElement.innerText;
+          navigator.clipboard.writeText(tokenText)
+              .then(() => {
+                  alert('トークンがクリップボードにコピーされました。');
+              })
+              .catch(err => {
+                  console.error('コピーエラー:', err);
+              });
         });
     </script>
 </body>
