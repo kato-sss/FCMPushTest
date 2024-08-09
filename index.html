@@ -45,6 +45,9 @@
       <div class="col-auto">
         <button id="get_token" class="btn btn-primary mt-2">トークン発行</button>
       </div>
+      <div class="col-auto">
+        <button id="delete_token" class="btn btn-danger mt-2">通知解除</button>
+      </div>
   </div>
     <div class="form-group row mt-2">
       <label for="" class="control-label col-md-3 col-form-label-sm" id="status_token">トークン</label>
@@ -58,7 +61,7 @@
     <p id="output"></p>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+        import { getMessaging, getToken, deleteToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -77,6 +80,7 @@
         const copyButton = document.getElementById('copy_token');
         const outputElement = document.getElementById('output_token');
         const getTokenButton = document.getElementById('get_token');
+        const deleteTokenButton = document.getElementById('delete_token');
 
         // 通知を許可するボタンが押された時のアクション
         getTokenButton.addEventListener("click", requestNotificationPermissionAndGetToken);
@@ -89,12 +93,29 @@
           const tokenText = outputElement.textContent || outputElement.innerText;
           navigator.clipboard.writeText(tokenText)
               .then(() => {
-                  alert('トークンがクリップボードにコピーされました。');
+                  if(tokenText){
+                    alert('トークンがクリップボードにコピーされました。');
+                  }else{
+                    alert('トークンがありません');
+                  }
               })
               .catch(err => {
                   console.error('コピーエラー:', err);
               });
         });
+
+        deleteTokenButton.addEventListener('click', function(){
+          const messaging = getMessaging();
+          deleteToken(messaging)
+              .then(() => {
+                  console.log('Token deleted successfully.');
+                  outputElement.textContent = ''; // Clear the token from the display
+                  alert("通知を解除しました。");
+              })
+              .catch((err) => {
+                  console.error('Error deleting token:', err);
+              });
+        })
 
         function requestNotificationPermissionAndGetToken(){
             //let promise = Notification.requestPermission();
