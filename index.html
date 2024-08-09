@@ -8,15 +8,9 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <script>
     // service workerが有効なら、service-worker.js を登録します
-   if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./firebase-messaging-sw.js')
-        .then((registration) => {
-          console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch((error) => {
-          console.error('Service Worker registration failed:', error);
-        });
-    }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+   }
   </script>
   <style>
     /* スマホでのレイアウト調整 */
@@ -79,6 +73,15 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./firebase-messaging-sw.js')
+            .then(function (registration) {
+              console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function (err) {
+              console.log('Service Worker registration failed:', err);
+            });
+        }
 
         const copyButton = document.getElementById('copy_token');
         const outputElement = document.getElementById('output_token');
