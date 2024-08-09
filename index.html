@@ -10,6 +10,13 @@
     // service workerが有効なら、service-worker.js を登録します
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js');
+      navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: '/' })
+      .then(function (registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(function (error) {
+        console.error('Service Worker registration failed:', error);
+      });
    }
   </script>
   <style>
@@ -74,15 +81,6 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
 
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/FCMPushTest/firebase-messaging-sw.js')
-            .then(function (registration) {
-              console.log('Service Worker registered with scope:', registration.scope);
-            }).catch(function (err) {
-              console.log('Service Worker registration failed:', err);
-            });
-        }
-
         const copyButton = document.getElementById('copy_token');
         const outputElement = document.getElementById('output_token');
         const getTokenButton = document.getElementById('get_token');
@@ -91,7 +89,7 @@
         getTokenButton.addEventListener("click", requestNotificationPermissionAndGetToken);
 
 		    // ページの読み込み時に通知を許可し、トークンを取得します
-        // window.addEventListener('load', requestNotificationPermissionAndGetToken);
+        window.addEventListener('load', requestNotificationPermissionAndGetToken);
 
         // ボタンがクリックされたときにトークンをコピー
         copyButton.addEventListener('click', function () {
